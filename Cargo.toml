@@ -4,6 +4,6 @@ version = "0.1.0"
 authors = ["Christoph Wurst <christoph@winzerhof-wurst.at>"]
 
 [dependencies]
-schani = { path = "../schani" }
+schani = { git = "https://github.com/schani-rs/schani.git" }
 rocket = "0.2.6"
 rocket_codegen = "0.2.6"
