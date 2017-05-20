@@ -50,12 +50,13 @@ fn main() {
                     println!("got consumer stream");
 
                     stream.for_each(move |message| {
-                                        println!("got message: {:?}", message);
-                                        println!("decoded message: {:?}",
-                                                 std::str::from_utf8(&message.data).unwrap());
-                                        ch.basic_ack(message.delivery_tag);
-                                        Ok(())
-                                    })
+                        let file_id_str = std::str::from_utf8(&message.data).unwrap();
+                        let file_id = file_id_str.parse::<u64>().unwrap();
+                        println!("got message: {:?}", message);
+                        println!("file id: {:?}", file_id);
+                        ch.basic_ack(message.delivery_tag);
+                        Ok(())
+                    })
                 })
         }))
         .unwrap();
