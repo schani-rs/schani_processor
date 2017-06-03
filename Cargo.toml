@@ -7,8 +7,8 @@ authors = ["Christoph Wurst <christoph@winzerhof-wurst.at>"]
 amq-protocol = "^0.16"
 futures = "^0.1"
 lapin-futures = "^0.8"
-rocket = "0.2.6"
-rocket_codegen = "0.2.6"
+rocket = "0.2.8"
+rocket_codegen = "0.2.8"
 schani = { git = "https://github.com/schani-rs/schani.git" }
 tokio-core = "0.1.7"
 tokio-io = "^0.1"
