@@ -1,9 +1,12 @@
 extern crate amq_protocol;
+extern crate dotenv;
 extern crate futures;
 extern crate tokio_core;
 extern crate lapin_futures as lapin;
 
+use std::env;
 use amq_protocol::types::FieldTable;
+use dotenv::dotenv;
 use futures::Stream;
 use futures::future::Future;
 use tokio_core::reactor::Core;
@@ -12,11 +15,12 @@ use lapin::client::ConnectionOptions;
 use lapin::channel::{BasicConsumeOptions, QueueDeclareOptions};
 
 fn main() {
+    dotenv().ok();
 
     // create the reactor
     let mut core = Core::new().unwrap();
     let handle = core.handle();
-    let addr = "127.0.0.1:5672".parse().unwrap();
+    let addr = env::var("AMQP_ADDRESS").expect("AMQP_ADDRESS must be set").parse().unwrap();
 
     core.run(TcpStream::connect(&addr, &handle)
                  .and_then(|stream| {
