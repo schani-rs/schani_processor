@@ -9,8 +9,8 @@ RUN apt-get update && \
 
 USER rawtherapee
 
-COPY target/release/processor /usr/local/bin
+COPY target/release/webservice /usr/local/bin
 
 EXPOSE 8000
 
-ENTRYPOINT ["/usr/local/bin/processor"]
+ENTRYPOINT ["/usr/local/bin/webservice"]
