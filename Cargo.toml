@@ -8,6 +8,7 @@ amq-protocol = "^0.16"
 dotenv = "0.8.0"
 futures = "^0.1"
 lapin-futures = "^0.8"
+resolve = "0.1.2"
 rocket = "0.2.8"
 rocket_codegen = "0.2.8"
 schani = { git = "https://github.com/schani-rs/schani.git" }

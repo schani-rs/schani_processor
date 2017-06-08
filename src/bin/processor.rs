@@ -1,18 +1,21 @@
 extern crate amq_protocol;
 extern crate dotenv;
 extern crate futures;
-extern crate tokio_core;
 extern crate lapin_futures as lapin;
+extern crate resolve;
+extern crate tokio_core;
 
 use std::env;
+use std::net;
 use amq_protocol::types::FieldTable;
 use dotenv::dotenv;
 use futures::Stream;
 use futures::future::Future;
-use tokio_core::reactor::Core;
-use tokio_core::net::TcpStream;
 use lapin::client::ConnectionOptions;
 use lapin::channel::{BasicConsumeOptions, QueueDeclareOptions};
+use tokio_core::reactor::Core;
+use tokio_core::net::TcpStream;
+use resolve::resolve_host;
 
 fn main() {
     dotenv().ok();
@@ -20,8 +23,11 @@ fn main() {
     // create the reactor
     let mut core = Core::new().unwrap();
     let handle = core.handle();
-    let addr = env::var("AMQP_ADDRESS").expect("AMQP_ADDRESS must be set").parse().unwrap();
+    let host = env::var("AMQP_ADDRESS").expect("AMQP_ADDRESS must be set");
+    let host_addr = resolve_host(&host).expect("could not lookup host").last().unwrap();
+    let addr = net::SocketAddr::new(host_addr, 5672);
 
+    println!("connecting to AMQP service at {}", host_addr);
     core.run(TcpStream::connect(&addr, &handle)
                  .and_then(|stream| {
 
