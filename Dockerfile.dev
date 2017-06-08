@@ -1,0 +1,9 @@
+from jamesnetherton/rawtherapee:latest
+
+USER rawtherapee
+
+VOLUME ["/schani_processor"]
+
+EXPOSE 8000
+
+ENTRYPOINT ["/schani_processor/processor"]
