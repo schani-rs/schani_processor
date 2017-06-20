@@ -1,17 +1,21 @@
-use schani::images::RawtherapeeImage;
+use std::path::PathBuf;
 use std::process::Command;
 use std::result::Result;
 
-pub fn process_raw(img: &RawtherapeeImage) -> Result<(), &'static str> {
-    let status = try!(Command::new("rawtherapee-cli")
+pub fn process_raw(path: &PathBuf, out: &PathBuf) -> Result<(), &'static str> {
+    let output = try!(Command::new("rawtherapee")
                           .arg("-j90")
                           .arg("-Y")
+                          .arg("-O")
+                          .arg(out)
                           .arg("-c")
-                          .arg(&img.raw)
-                          .status()
-                          .map_err(|_| "could not process raw image"));
+                          .arg(path)
+                          .output()
+                          .map_err(|_| "could not start rawtherapee"));
 
-    if status.success() {
+    println!("{:?}", output);
+
+    if output.status.success() {
         Ok(())
     } else {
         Err("rawtherapee process returned error status code")
@@ -20,8 +24,8 @@ pub fn process_raw(img: &RawtherapeeImage) -> Result<(), &'static str> {
 
 #[cfg(test)]
 mod test {
-    use super::super::schani::images::RawtherapeeImage;
     use super::process_raw;
+    use std::path::PathBuf;
     use std::process::Command;
 
     fn is_rawtherapee_installed() -> bool {
@@ -35,13 +39,10 @@ mod test {
             return ();
         }
 
-        let raw1 = RawtherapeeImage {
-            name: "raw1".to_string(),
-            raw: "resources/RAW1.NEF".to_string(),
-            sidecar: "resources/RAW1.NEF.pp3".to_string(),
-        };
+        let path = PathBuf::from("resources/RAW1.NEF");
+        let out = PathBuf::from("/tmp/");
 
-        assert!(process_raw(&raw1).is_ok());
+        assert!(process_raw(&path, &out).is_ok());
     }
 
     #[test]
@@ -51,12 +52,9 @@ mod test {
             return ();
         }
 
-        let raw1 = RawtherapeeImage {
-            name: "x".to_string(),
-            raw: "resources/x".to_string(),
-            sidecar: "resources/x".to_string(),
-        };
+        let path = PathBuf::from("resources/nope.NEF");
+        let out = PathBuf::from("/tmp/");
 
-        assert!(process_raw(&raw1).is_err());
+        assert!(process_raw(&path, &out).is_err());
     }
 }
