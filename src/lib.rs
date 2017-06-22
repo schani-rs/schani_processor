@@ -3,7 +3,6 @@ extern crate hyper;
 extern crate log;
 extern crate schani;
 extern crate serde_json;
-extern crate serde_urlencoded;
 extern crate temporary;
 extern crate url;
 

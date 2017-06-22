@@ -3,6 +3,8 @@ extern crate env_logger;
 extern crate dotenv;
 extern crate futures;
 extern crate lapin_futures as lapin;
+#[macro_use]
+extern crate log;
 extern crate resolve;
 extern crate schani_processor;
 extern crate tokio_core;
@@ -72,11 +74,11 @@ fn main() {
                         println!("got consumer stream");
 
                         stream.for_each(move |message| {
-                            let file_id_str = std::str::from_utf8(&message.data).unwrap();
-                            let file_id = file_id_str.parse::<i32>().unwrap();
-                            println!("got message: {:?}", message);
-                            println!("file id: {:?}", file_id);
-                            try!(process_raw_image(file_id).map_err(|err| {
+                            info!("got message: {:?}", message);
+                            let image_id_str = std::str::from_utf8(&message.data).unwrap();
+                            let image_id = image_id_str.parse::<i32>().unwrap();
+                            info!("image id: {:?}", image_id);
+                            try!(process_raw_image(image_id).map_err(|err| {
                                 std::io::Error::new(std::io::ErrorKind::Other, err)
                             }));
                             ch.basic_ack(message.delivery_tag);
