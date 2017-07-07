@@ -1,7 +1,6 @@
 extern crate hyper;
 #[macro_use]
 extern crate log;
-extern crate schani;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
