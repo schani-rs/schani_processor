@@ -4,7 +4,7 @@ use std::io::Read;
 use std::io::prelude::*;
 use std::path::PathBuf;
 
-use hyper::{self, header, method, Url};
+use hyper::{self, header};
 use hyper::client::Request;
 use serde_json;
 

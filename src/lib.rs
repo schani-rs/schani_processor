@@ -1,40 +1,48 @@
+extern crate dotenv;
+extern crate env_logger;
+extern crate futures;
 extern crate hyper;
+extern crate lapin_async;
+extern crate lapin_futures as lapin;
 #[macro_use]
 extern crate log;
+extern crate resolve;
+extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
 extern crate temporary;
+extern crate tokio_core;
 extern crate url;
 
-mod image_recognition;
-pub mod error;
-pub mod rawtherapee;
-mod store;
+// mod image_recognition;
+mod error;
+mod rawtherapee;
+mod service;
+mod queue;
 
-use rawtherapee::process_raw;
-use store::{load_raw_file, upload_image_file};
-use image_recognition::classify_image;
+use std::env;
+use std::net;
+use std::str;
 
-use temporary::Directory;
+use lapin_async::queue::Message;
+use tokio_core::reactor::Core;
 
-pub fn process_raw_image(image_id: i32) -> Result<(), error::Error> {
-    // Create a temporary directory.
-    info!("processing image {} …", image_id);
-    let directory = Directory::new("raw_images").unwrap();
+pub fn run() {
+    // create the reactor
+    let core = Core::new().unwrap();
+    let host = env::var("AMQP_ADDRESS").expect("AMQP_ADDRESS must be set");
+    let host_addr = resolve::resolve_host(&host)
+        .expect("could not lookup host")
+        .last()
+        .unwrap();
+    let addr = net::SocketAddr::new(host_addr, 5672);
+    println!("connecting to AMQP service at {}", host_addr);
 
-    let tmp_path = directory.join(image_id.to_string() + &".NEF".to_string());
-    println!("{:?}", tmp_path);
-    let img_path = directory.join(image_id.to_string() + &".jpg".to_string());
-    let target_path = directory.into_path();
-
-    try!(load_raw_file(image_id, &tmp_path));
-    info!("loaded image {} …", image_id);
-    try!(process_raw(&tmp_path, &target_path));
-    info!("processed image {} …", image_id);
-    try!(upload_image_file(image_id, &target_path));
-    info!("uploaded image {} …", image_id);
-    try!(classify_image(&img_path));
-
-    Ok(())
+    queue::run(&addr, core, &|message: &Message| {
+        info!("got message: {:?}", message);
+        let image_id = str::from_utf8(&message.data).unwrap().to_string();
+        info!("image id: {:?}", image_id);
+        service::processor::process_raw_image(image_id).map_err(|err| err.into())
+    });
 }

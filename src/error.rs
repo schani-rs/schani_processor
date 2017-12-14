@@ -67,3 +67,9 @@ impl From<io::Error> for Error {
         Error::IO(orig)
     }
 }
+
+impl Into<io::Error> for Error {
+    fn into(self) -> io::Error {
+        io::Error::new(io::ErrorKind::Other, self)
+    }
+}

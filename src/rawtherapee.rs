@@ -3,7 +3,7 @@ use std::process::Command;
 use std::result::Result;
 
 pub fn process_raw(path: &PathBuf, out: &PathBuf) -> Result<(), &'static str> {
-    let output = try!(Command::new("rawtherapee")
+    let output = try!(Command::new("rawtherapee-cli")
                           .arg("-j90")
                           .arg("-Y")
                           .arg("-O")
