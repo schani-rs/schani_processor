@@ -1,24 +1,21 @@
 [package]
 name = "schani_processor"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Christoph Wurst <christoph@winzerhof-wurst.at>"]
 
 [dependencies]
-amq-protocol = "^0.16"
-dotenv = "0.8.0"
+dotenv = "0.10.1"
 env_logger = "0.4.3"
-futures = "^0.1"
-hyper = "^0.10"
-lapin-futures = "^0.8"
-log = "^0.3"
+futures = "0.1.17"
+hyper = "^0.11"
+lapin-async = "*"
+lapin-futures = "0.10.0"
+log = "0.3.8"
 resolve = "0.1.2"
-rocket = "0.2.8"
-rocket_codegen = "0.2.8"
-serde = "^0.9"
-serde_derive = "^0.9"
-serde_json="^0.9"
+schani_library_client = { git = "https://github.com/schani-rs/schani_library_client.git" }
+schani_store_client = { git = "https://github.com/schani-rs/schani_store_client.git" }
 temporary = "0.6.3"
-tokio-core = "0.1.7"
+tokio-core = "0.1.10"
 tokio-io = "^0.1"
 tokio-timer = "^0.1"
-url = "^1.4"
+url = "^1.6"
