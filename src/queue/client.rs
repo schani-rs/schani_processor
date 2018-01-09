@@ -1,8 +1,8 @@
 use std::io;
 use std::net;
+use std::thread;
 
-use futures::Stream;
-use futures::future::Future;
+use futures::{Future, Stream};
 use lapin;
 use lapin_async::queue::Message;
 use lapin::client::ConnectionOptions;
@@ -11,14 +11,28 @@ use lapin::channel::{BasicConsumeOptions, QueueDeclareOptions};
 use tokio_core::reactor::Core;
 use tokio_core::net::TcpStream;
 
-pub fn run(addr: &net::SocketAddr, mut core: Core, fun: &Fn(&Message) -> Result<(), io::Error>) {
+pub fn run(
+    addr: &net::SocketAddr,
+    mut core: Core,
+    fun: &Fn(Message) -> Box<Future<Item = Message, Error = io::Error>>,
+) {
     let work = TcpStream::connect(addr, &core.handle())
         .and_then(|stream| {
             // connect() returns a future of an AMQP Client
             // that resolves once the handshake is done
             lapin::client::Client::connect(stream, &ConnectionOptions::default())
         })
-        .and_then(|(client, _heartbeat)| {
+        .and_then(|(client, heartbeat)| {
+            let heartbeat_client = client.clone();
+            thread::Builder::new()
+                .name("heartbeat thread".to_string())
+                .spawn(move || {
+                    Core::new()
+                        .unwrap()
+                        .run(heartbeat(&heartbeat_client))
+                        .unwrap();
+                })
+                .unwrap();
             // create_channel returns a future that is resolved
             // once the channel is successfully created
             client.create_channel()
@@ -47,9 +61,11 @@ pub fn run(addr: &net::SocketAddr, mut core: Core, fun: &Fn(&Message) -> Result<
                     println!("got consumer stream");
 
                     stream.for_each(move |message| {
-                        fun(&message)?;
-                        ch.basic_ack(message.delivery_tag);
-                        Ok(())
+                        let chan = ch.clone();
+                        fun(message).and_then(move |message| {
+                            chan.basic_ack(message.delivery_tag);
+                            Ok(())
+                        })
                     })
                 })
         });

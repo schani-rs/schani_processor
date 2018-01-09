@@ -1,24 +1,25 @@
+use std::io;
 use std::path::PathBuf;
 use std::process::Command;
 use std::result::Result;
 
-pub fn process_raw(path: &PathBuf, out: &PathBuf) -> Result<(), &'static str> {
-    let output = try!(Command::new("rawtherapee-cli")
-                          .arg("-j90")
-                          .arg("-Y")
-                          .arg("-O")
-                          .arg(out)
-                          .arg("-c")
-                          .arg(path)
-                          .output()
-                          .map_err(|_| "could not start rawtherapee"));
+pub fn process_raw(path: &PathBuf, out: &PathBuf) -> Result<(), io::Error> {
+    let output = Command::new("rawtherapee-cli")
+        .arg("-j90")
+        .arg("-Y")
+        .arg("-O")
+        .arg(out)
+        .arg("-c")
+        .arg(path)
+        .output()?;
 
     println!("{:?}", output);
 
     if output.status.success() {
         Ok(())
     } else {
-        Err("rawtherapee process returned error status code")
+        error!("RawTherapee process returned an error status code");
+        Err(io::Error::from(io::ErrorKind::Other))
     }
 }
 
