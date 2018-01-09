@@ -12,8 +12,8 @@ lapin-async = "*"
 lapin-futures = "0.10.0"
 log = "0.3.8"
 resolve = "0.1.2"
-schani_library_client = { path = "../schani_library_client" }
-schani_store_client = { path = "../schani_store_client" }
+schani_library_client = { git = "https://github.com/schani-rs/schani_library_client.git" }
+schani_store_client = { git = "https://github.com/schani-rs/schani_store_client.git" }
 temporary = "0.6.3"
 tokio-core = "0.1.10"
 tokio-io = "^0.1"
