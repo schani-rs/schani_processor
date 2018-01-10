@@ -85,7 +85,7 @@ pub fn run() {
                 .get_image(image_id)
                 .map_err(|_| io::Error::from(io::ErrorKind::Other))
                 .and_then(move |image: Image| {
-                    trace!("processing image {} …", image.id);
+                    info!("processing image {}", image.id);
 
                     // Create a temporary directory.
                     futures::lazy(move || temporary::Directory::new("raw_images"))
@@ -98,6 +98,7 @@ pub fn run() {
                     info!("image path: {:?}", img_path);
                     let raw_id = image.raw_id.clone().unwrap();
                     let sidecar_id = image.sidecar_id.clone().unwrap();
+                    info!("raw_id: {} sidecar_id: {}", raw_id, sidecar_id);
 
                     store_client2
                         .get_raw_image(&raw_id)
