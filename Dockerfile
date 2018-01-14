@@ -1,9 +1,10 @@
-from jamesnetherton/rawtherapee:latest
+FROM rust:1.23.0
+WORKDIR /usr/src/myapp
+COPY . .
+RUN cargo build --release
 
+FROM jamesnetherton/rawtherapee:latest
 USER rawtherapee
+COPY --from=0 /usr/src/myapp/target/release/processor /usr/local/bin
 
-COPY target/release/webservice /usr/local/bin
-
-EXPOSE 8000
-
-ENTRYPOINT ["/usr/local/bin/webservice"]
+ENTRYPOINT ["processor"]
