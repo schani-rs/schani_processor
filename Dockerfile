@@ -5,6 +5,6 @@ RUN cargo build --release
 
 FROM jamesnetherton/rawtherapee:latest
 USER rawtherapee
-COPY --from=0 /usr/src/myapp/target/release/processor /usr/local/bin
+COPY --from=0 /usr/src/myapp/target/release/schani_processor /usr/local/bin
 
-ENTRYPOINT ["processor"]
+ENTRYPOINT ["schani_processor"]
