@@ -4,7 +4,7 @@ use std::process::Command;
 use std::result::Result;
 
 pub fn process_raw(path: &PathBuf, out: &PathBuf) -> Result<(), io::Error> {
-    let output = Command::new("rawtherapee-cli")
+    let output = Command::new("rawtherapee")
         .arg("-j90")
         .arg("-Y")
         .arg("-O")
