@@ -6,7 +6,6 @@ extern crate lapin_async;
 extern crate lapin_futures as lapin;
 #[macro_use]
 extern crate log;
-extern crate resolve;
 extern crate schani_library_client;
 extern crate schani_store_client;
 extern crate temporary;
@@ -23,7 +22,7 @@ use std::fs::File;
 use std::io;
 use std::io::{BufReader, BufWriter};
 use std::io::prelude::*;
-use std::net;
+use std::net::ToSocketAddrs;
 use std::str;
 use std::sync::Arc;
 
@@ -59,17 +58,17 @@ pub fn run() {
 
     // create the reactor
     let core = Core::new().unwrap();
-    let host_addr = resolve::resolve_host(&config.amqp_addr)
-        .expect("could not lookup host")
-        .last()
-        .unwrap();
-    let addr = net::SocketAddr::new(host_addr, 5672);
+    let host_addr = (config.amqp_addr.as_str(), 5672)
+        .to_socket_addrs()
+        .expect("could not resolve AMQP host")
+        .next()
+        .expect("could not resolve AMQP host");
     println!("connecting to AMQP service at {}", host_addr);
     let handle = core.handle();
     let lib_client = Arc::new(LibraryClient::new(config.library_uri.clone(), &handle));
     let store_client = Arc::new(StoreClient::new(config.store_uri.clone(), &handle));
 
-    queue::run(&addr, core, &|message: Message| {
+    queue::run(&host_addr, core, &|message: Message| {
         info!("got message: {:?}", message);
         let image_id = str::from_utf8(&message.data)
             .unwrap()

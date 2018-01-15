@@ -11,7 +11,6 @@ hyper = "^0.11"
 lapin-async = "*"
 lapin-futures = "0.10.0"
 log = "0.3.8"
-resolve = "0.1.2"
 schani_library_client = { git = "https://github.com/schani-rs/schani_library_client.git" }
 schani_store_client = { git = "https://github.com/schani-rs/schani_store_client.git" }
 temporary = "0.6.3"
