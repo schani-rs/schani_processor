@@ -16,5 +16,5 @@ schani_store_client = { git = "https://github.com/schani-rs/schani_store_client.
 temporary = "0.6.3"
 tokio-core = "0.1.10"
 tokio-io = "^0.1"
-tokio-timer = "^0.1"
+tokio-timer = "^0.2"
 url = "^1.6"
