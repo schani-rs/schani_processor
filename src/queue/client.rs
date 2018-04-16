@@ -4,7 +4,7 @@ use std::thread;
 
 use futures::{Future, Stream};
 use lapin;
-use lapin_async::queue::Message;
+use lapin::message::Delivery;
 use lapin::client::ConnectionOptions;
 use lapin::types::FieldTable;
 use lapin::channel::{BasicConsumeOptions, QueueDeclareOptions};
@@ -14,7 +14,7 @@ use tokio_core::net::TcpStream;
 pub fn run(
     addr: &net::SocketAddr,
     mut core: Core,
-    fun: &Fn(Message) -> Box<Future<Item = Message, Error = io::Error>>,
+    fun: &Fn(Delivery) -> Box<Future<Item = Delivery, Error = io::Error>>,
 ) {
     let work = TcpStream::connect(addr, &core.handle())
         .and_then(|stream| {

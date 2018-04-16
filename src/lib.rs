@@ -2,7 +2,6 @@ extern crate dotenv;
 extern crate env_logger;
 extern crate futures;
 extern crate hyper;
-extern crate lapin_async;
 extern crate lapin_futures as lapin;
 #[macro_use]
 extern crate log;
@@ -30,7 +29,7 @@ use futures::Future;
 use hyper::Uri;
 use schani_library_client::{Image, LibraryClient};
 use schani_store_client::StoreClient;
-use lapin_async::queue::Message;
+use lapin::message::Delivery;
 use tokio_core::reactor::Core;
 
 struct Config {
@@ -68,7 +67,7 @@ pub fn run() {
     let lib_client = Arc::new(LibraryClient::new(config.library_uri.clone(), &handle));
     let store_client = Arc::new(StoreClient::new(config.store_uri.clone(), &handle));
 
-    queue::run(&host_addr, core, &|message: Message| {
+    queue::run(&host_addr, core, &|message: Delivery| {
         info!("got message: {:?}", message);
         let image_id = str::from_utf8(&message.data)
             .unwrap()
